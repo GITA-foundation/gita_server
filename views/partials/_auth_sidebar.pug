@@ -1,0 +1,31 @@
+//control-menu==================================================
+#control-menu.line-height-large.m-bottom-8(data-currentpage='#{pageName}')
+  if (['admin', 'supernode'].includes(req.user.role))
+    .panel
+      a.control-menu-top.collapsed(data-toggle='collapse', data-parent='#control-menu', href='#collapseFaq')
+        span.glyphicon.glyphicon-window.m-right-2
+        | Contact
+      #collapseFaq.panel-collapse.collapse
+        ul.list-unstyled.p-left-6
+          li
+            a#faq-contact(href='/admin/faq') List
+
+  if (['admin'].includes(req.user.role))
+    .panel
+      a.control-menu-top.collapsed(data-toggle='collapse', data-parent='#control-menu', href='#collapseForm')
+        span.glyphicon.glyphicon-orderform.m-right-2
+        | Form
+      #collapseForm.panel-collapse.collapse
+        ul.list-unstyled.p-left-6
+          li
+            a#members(href='/admin/schema') Schema
+
+  //- 會員管理 members
+  .panel
+    a.control-menu-top.collapsed(data-toggle='collapse', data-parent='#control-menu', href='#collapseEight')
+      span.glyphicon.glyphicon-user.m-right-2
+      | Member
+    #collapseEight.panel-collapse.collapse
+      ul.list-unstyled.p-left-6
+        li
+          a#members(href='/admin/members') List

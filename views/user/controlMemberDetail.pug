@@ -1,0 +1,122 @@
+extends ../_layout_auth
+
+block body
+  #modal-member-delete.modal.fade
+    .modal-dialog(role='document')
+      .modal-content.font-size-slarge
+        .modal-header.p-30
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h2.modal-title Delete
+        .modal-body.p-30.p-top-0
+          p Are you sure
+            span
+            | will delete it?
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+          button#deleteMember.btn.btn-green(type='button', alt=member.id) Confirm
+
+  h2.m-bottom-6 Member
+  .well.control-well.p-30.m-bottom-8
+    form#memberDetail.form-horizontal(name="memberDetail")
+      .row.row-m
+        .col-md-6
+          .form-group.m-bottom-0
+            label.col-md-2.control-label.text-muted Name
+            .col-md-10
+              p.form-control-static #{member.fullName}
+      .row.row-m
+        .col-md-6
+          .form-group.m-bottom-0
+            label.col-md-2.control-label.text-muted ID
+            .col-md-10
+              p.form-control-static #{member.id}
+        .col-md-6
+          .form-group.m-bottom-0
+            label.col-md-2.control-label.text-muted Email
+            .col-md-10
+              p.form-control-static #{member.email}
+      .row.row-m
+        .col-md-6
+          .form-group.m-bottom-0
+            label.col-md-2.control-label.text-muted Type
+            .col-md-10
+              select.form-control(name='type', value=member.type disabled=(req.user.role=='node'))
+                option(value="personal" selected=(member.type=="personal")) Personal
+                option(value="entity" selected=(member.type=="entity")) Entity
+        .col-md-6
+          .form-group.m-bottom-0
+            label.col-md-2.control-label.text-muted Phone
+            .col-md-10
+              - var phone = member.phone == 'null'?'':member.phone;
+              input(name="phone", value=phone, type="text" disabled=(req.user.role=='node'))
+      .row.row-m
+        .col-md-12
+          .form-group.m-bottom-0
+            label.col-md-1.control-label.text-muted Address
+            .col-md-11
+              p.form-control-static #{member.address}
+      .row.row-m
+        .col-md-12
+          .form-group
+            label.col-md-1.control-label.text-muted Role
+            .col-md-11
+              select.form-control(name='role', value=member.role disabled=(req.user.role=='node'))
+                each role, index in roles
+                  option(value=role selected=(member.role==role)) #{role}
+
+      .row.row-m
+        .col-md-12
+          .form-group
+            label.col-md-1.control-label.text-muted Verification
+            .col-md-11
+              select.form-control(name='isVerified' , value=member.isVerified)
+                option(value="true" selected=(member.isVerified==true)) Verified
+                option(value="false" selected=(member.isVerified==false)) Unverified
+
+      .row.row-m
+        .col-md-12
+          .form-group
+            label.col-md-1.control-label.text-muted Comment
+            .col-md-11
+              textarea.form-control(name="comment", rows='3') #{member.comment}
+              input#userId(name="id", value=member.id, type="hidden")
+
+  hr.dashed-line
+  table#collapse-purchase.table.table-purchase
+    thead
+      tr
+        th Create Date
+        th Title
+        th Token ticket
+        th Gita Standard
+        th Status
+        th Verified
+    tbody
+      each project, index in projects
+          tr(class = !project.isVerified?"disabled":"")
+            td #{sails.moment(project.createdAt).format('YYYY/MM/DD')}
+            td #{project.title}
+            td #{project.token}
+            td
+              label #{project.isGitaStandard ? 'MATCH' : 'NOT_MATCH' }
+            td
+              select.form-control(name='status' data-identity=project.identity)
+                option(value="draft", selected=project.status == 'draft') Draft
+                option(value="publish", selected=project.status == 'publish') Publish
+            td
+              .btn-group.btn-group-switch(data-toggle='buttons', data-identity=project.identity)
+                label.btn.btn-default.btn-hide.btn-sm(class=!project.isVerified ? "active" : "")
+                  input#option-unpublish(type='radio', name='options', autocomplete='off', checked=project.isVerified?'checked':undefined, value='0')
+                  span.btn-text Unverified
+                label.btn.btn-default.btn-sm(class=project.isVerified ? "active" : "")
+                  input#option-publish(type='radio', name='options', autocomplete='off', checked=project.isVerified?'checked':undefined, value='1')
+                  span.btn-text Verified
+
+  .text-center.m-top-8.m-bottom-6
+    //- a.btn.btn-link.delete-link.btn-lg(data-toggle="modal", data-target="#modal-member-delete") 刪除會員
+    button#update-user-btn.btn.btn-green.btn-lg(form="memberDetail") Save
+    a.btn.btn-link.btn-lg(href="/admin/members") Back
+
+block js
+  script(src='/javascripts/admin/controlMemberDetail.js')

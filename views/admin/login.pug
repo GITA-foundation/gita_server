@@ -1,0 +1,26 @@
+extends ./../_layout_admin
+block body
+    if (errors)
+     each error in errors
+       include ./../common/warning
+
+    .container.font-size-slarge
+      .row.m-top-10.m-bottom-10
+        .col-sm-6.col-sm-offset-3
+          .border-block-3.p-40
+            .form-group(style='text-align: center;')
+              h2.text-center.m-bottom-4 Portal login
+              | Please input node account and password
+              hr
+              form(action="/auth/local", method="POST").form-horizontal
+                .form-group
+                  label.col-md-2.control-label Account
+                  .col-md-10
+                    input.form-control(type='text', placeholder='User name', name='identifier')
+                .form-group
+                  label.col-md-2.control-label Password
+                  .col-md-10
+                    input.form-control(type='password', placeholder='Password', name='password')
+                .row.m-top-6
+                  .col-sm-6.col-sm-offset-3
+                    input.btn.btn-black.btn-block.border-radius-circle(type="submit", value="Login")

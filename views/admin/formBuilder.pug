@@ -1,0 +1,58 @@
+extends ../_layout_auth
+
+block body
+  h2.m-bottom-6 Form builder
+  .well.control-well.p-30.m-bottom-8
+    form.form-horizontal(name="formBuilder")
+      .row.row-m
+        .col-md-12
+          #fb-editor
+
+block js
+  script(src='http://formbuilder.online/assets/js/form-builder.min.js')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js')
+  script.
+    jQuery(function($) {
+      var options = {
+        disableFields: ['hidden', 'autocomplete', 'paragraph', 'button', 'date', 'checkbox-group'],
+        disabledActionButtons: ['data', 'save'],
+        disabledAttrs: ['multiple'],
+        actionButtons: [{
+          id: 'Update',
+          className: 'btn btn-success',
+          label: 'update',
+          type: 'button',
+          events: {
+          click: function() {
+            saveData();
+          }
+        }
+        }],
+        defaultFields: !{data.schema},
+        typeUserAttrs: !{JSON.stringify(customAttrs)},
+        inputSets: !{JSON.stringify(inputSets)},
+      };
+
+      options.defaultFields.map(function (data) {
+        if (! data.subtype )
+          console.log(data);
+      })
+      var formBuilder = $(document.getElementById('fb-editor')).formBuilder(options);
+      var saveData = function () {
+        var newFormData = formBuilder.actions.getData();
+        $.ajax({
+          url: "/api/admin/schema/update?t=" + new Date().valueOf(),
+          type: 'POST',
+          data: {
+            formData: newFormData
+          },
+          success: function(result) {
+            alert("Update successed");
+            window.location.reload;
+          },
+          error: function() {
+            alert('Please try again.');
+          }
+        });
+      };
+    });

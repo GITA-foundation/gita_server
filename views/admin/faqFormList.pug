@@ -1,0 +1,22 @@
+extends ../_layout_auth
+
+block body
+  h2.m-bottom-6 Contact us
+
+  table.table.table-striped
+    thead
+      tr
+        th.col-md-1 Created
+        th.col-md-1 Name
+        th.col-md-2 Contact
+        th.col-md-4 Content
+    tbody
+      if (forms.length == 0)
+        script.
+          alert('Not found contact list')
+      each form in forms
+        tr(class='row-' + form.id)
+          td #{form.time}
+          td #{form.name}
+          td Email: #{form.email}
+          td #{form.content}

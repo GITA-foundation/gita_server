@@ -1,0 +1,108 @@
+extends ../_layout_auth
+include ../mixins/pagination
+
+block body
+  - var adminPermission = sails.config.adminPermission
+  - var flash = errors || req.flash('message') || req.flash('error') || ''
+  if flash.length != 0
+    .row.col-xs-12(id='flashMessage')
+      .alert.alert-danger(role='alert')
+        button(type="button", class="close", data-dismiss="alert", aria-label="Close")
+          span(aria-hidden="true") &times;
+        p #{flash}
+        p(style="display:none;")= flash
+
+  .row
+    .col-xs-10
+      h2.m-bottom-6 Member list
+    .col-xs-2.text-right
+      a(data-toggle='collapse', href='#collapse-member', aria-expanded='false')
+        span.glyphicon.glyphicon-zoomin.font-size-large.m-top-1
+  #collapse-member.collapse.in
+    - var maxDay = sails.moment().subtract(10, 'years').format('YYYY-MM-DD');
+
+    .well.control-well.p-30.m-bottom-8
+      form#searchUsers.form-horizontal.with-pagination(name="searchUsers", action="members", method="get")
+        +pagination-fields(page, totalPages, limit)
+        input(hidden="true" name="viewType", value='page')
+        .row.row-m
+          .col-md-4
+            .form-group
+              label.col-md-4.control-label Role
+              .col-md-8
+                select.form-control(name='role', value=query.role)
+                  option(value="" selected=(!query.role)) --Select--
+                  each role, index in roles
+                    option(value=role selected=(query.role==role)) #{role}
+          .col-md-4
+            .form-group
+              label.col-md-4.control-label Type
+              .col-md-8
+                select.form-control(name='type' , value=query.type)
+                  option(value="" selected=(!query.type)) --Select--
+                  option(value="personal" selected=(query.type=="personal")) Personal
+                  option(value="entity" selected=(query.type=="entity")) Entity
+          .col-md-4
+            .form-group
+              label.col-md-4.control-label Account
+              .col-md-8
+                input.form-control(type='text', name='username', value = query.username?query.username: '')
+          .col-md-4
+            .form-group
+              label.col-md-4.control-label Name
+              .col-md-8
+                input.form-control(type='text', name='fullName', value = query.fullName?query.fullName: '')
+          .col-md-4
+            .form-group
+              label.col-md-4.control-label Phone
+              .col-md-8
+                input.form-control(type='text', name='phone', value = query.phone?query.phone: '')
+          .col-md-4
+            .form-group
+              label.col-md-4.control-label Email
+              .col-md-8
+                input.form-control(type='text', name='email', value = query.email?query.email: '')
+          .col-md-12.text-right
+            a.btn.btn-primary(href='#' onClick='$("form[name=\'searchUsers\']").submit()' ) Query
+
+  if (adminPermission['members'].indexOf('members') >= 0)
+    .row
+      .col-md-6
+        form.form-inline
+          .form-group
+            label List
+            +pagination-limit(limit)
+            label items（Total is #{totalRows} rows）
+    hr.dashed-line
+    table.table.table-striped
+      thead
+        tr
+          th ID
+          th Account
+          th Name
+          th Phone
+          th Email
+          th Role
+          th isVerified
+          th Comment
+          th ---
+      tbody
+        each member in members.rows
+          tr
+            td #{member.id}
+            td #{member.username}
+            td #{member.fullName}
+            td #{member.mobile}
+            td #{member.email}
+            td #{member.role}
+            td #{member.isVerified ? 'True' : 'False'}
+            td #{member.comment}
+            td
+              a.btn.btn-link(href='member-detail/'+member.id)
+                span.glyphicon.glyphicon-pencil2
+
+    hr.dashed-line
+    +pagination-simple-pager(page, totalPages)
+
+  block js
+    script(src='/javascripts/common/pagination.js')

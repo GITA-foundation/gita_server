@@ -1,0 +1,4 @@
+-t 60000
+--require('chai').should()
+--recursive test/bootstrap.test.js
+--reporter spec
