@@ -5,10 +5,13 @@ loginRequired
 @description :: Simple policy to allow any authenticated user
 @docs        :: http://sailsjs.org/#!documentation/policies
  */
-module.exports = function(req, res, next) {
+
+
+module.exports = async function (req, res, next) {
   try {
-    const userInfo = UserService.getLoginUser(req);
-    return userInfo.isVerified ? next() : res.unauthorized('noAuthorizationHeaderFound');
+    const loginUser = UserService.getLoginUser(req);
+    const currentUser = await UserService.findOne(loginUser.id);
+    return currentUser.isVerified ? next() : res.unauthorized('noAuthorizationHeaderFound');
   } catch (e) {
     sails.log.verbose("error :", e);
     return res.unauthorized('noAuthorizationHeaderFound');

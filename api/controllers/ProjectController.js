@@ -3,9 +3,10 @@ const isUUID = (uuid) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a
 const ProjectController = {
   apiCreate: async (req, res) => {
     try {
-      if (!req.user) return res.serverError('Auth error');
+      const loginUser = UserService.getLoginUser(req);
+      if (!loginUser) return res.serverError('Auth error');
 
-      const isProjectExisted = await db.Project.findOne({ where: { UserId: req.user.id } });
+      const isProjectExisted = await db.Project.findOne({ where: { UserId: loginUser.id } });
 
       if (isProjectExisted) return res.serverError('Every User can create only ONE project');
 
@@ -15,14 +16,14 @@ const ProjectController = {
         token: formData.token_ticker || 'token',
         logo: formData.project_icon && formData.project_icon[0] && formData.project_icon[0].fd,
         items: formData,
-        UserId: req.user.id
+        UserId: loginUser.id
       });
 
       const projectId = result.id;
       const identity = result.identity;
 
       await Promise.all([
-        ProjectMentionedPersonService.createMentionedPerson({ projectId, identity, user: req.user, formData }),
+        ProjectMentionedPersonService.createMentionedPerson({ projectId, identity, user: loginUser, formData }),
         ProjectHistoryService.create(req, projectId)
       ]);
 
@@ -37,7 +38,8 @@ const ProjectController = {
   },
   apiCreateComment: async (req, res) => {
     try {
-      if (!req.user) return res.serverError('Auth error');
+      const loginUser = UserService.getLoginUser(req);
+      if (!loginUser) return res.serverError('Auth error');
 
       const { identity } = req.params;
       if (!isUUID(identity)) return res.serverError('invalid id');
@@ -50,7 +52,7 @@ const ProjectController = {
       const { data } = req.body;
       console.log('data ==>', data);
       const result = await db.Comment.create(data);
-      await result.setUser(req.user.id);
+      await result.setUser(loginUser.id);
       await result.setProject(findProject.id);
       return res.json({
         result: {
@@ -128,11 +130,12 @@ const ProjectController = {
   },
   apiGetMyProject: async(req, res) => {
     try {
+      const loginUser = UserService.getLoginUser(req);
       const project = await db.Project.findOne({
         attributes: [
           'identity', 'title', 'token', 'logo', 'items', 'status'
         ],
-        where: { UserId: req.user.id }
+        where: { UserId: loginUser.id }
       });
 
       if (!project) {
@@ -174,11 +177,11 @@ const ProjectController = {
       if (!isUUID(identity)) return res.badRequest('invalid id');
 
       const formData = req.body;
-      const user = req.user;
+      const loginUser = UserService.getLoginUser(req);
       let project = await db.Project.findOne({
         where: {
           identity,
-          UserId: user.id
+          UserId: loginUser.id
         }
       });
       if (!project) {
@@ -195,7 +198,7 @@ const ProjectController = {
       }
       const projectId = project.id;
       await Promise.all([
-        await ProjectMentionedPersonService.updateMentionedPerson({ projectId, user, formData: formData.items, identity }),
+        await ProjectMentionedPersonService.updateMentionedPerson({ projectId, user: loginUser, formData: formData.items, identity }),
         project.save(),
       ]);
 
@@ -222,10 +225,10 @@ const ProjectController = {
         throw new Error('找不到 Project！');
       }
 
-      const userInfo = UserService.getLoginUser(req);
+      const loginUser = UserService.getLoginUser(req);
 
       findProject.isVerified = true;
-      findProject.AdminUserId = userInfo.id;
+      findProject.AdminUserId = loginUser.id;
       let updateProject = await findProject.save();
       if (!updateProject) {
         req.flash('message', `Project ID ${identity} verify fail`);
@@ -253,8 +256,6 @@ const ProjectController = {
       if (!findProject) {
         throw new Error('找不到 Project！');
       }
-
-      const userInfo = UserService.getLoginUser(req);
 
       findProject.isVerified = false;
       const updateProject = await findProject.save();

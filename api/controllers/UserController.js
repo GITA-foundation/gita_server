@@ -40,7 +40,7 @@ const UserController = {
   apiResetPassword: async(req, res) => {
     sails.log.verbose('=== apiResetPassword ===');
     try {
-      const user = req.user;
+      const user = UserService.getLoginUser(req);
 
       if (!req.body.newPassword) {
         return res.badRequest('Invalid Parameter');
@@ -73,7 +73,7 @@ const UserController = {
     sails.log.verbose('=== apiUpdate ===');
 
     try {
-      const currentUser = req.user;
+      const currentUser = UserService.getLoginUser(req);
 
       if (currentUser) {
 
