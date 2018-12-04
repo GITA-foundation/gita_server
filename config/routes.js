@@ -41,13 +41,12 @@ module.exports.routes = {
   'GET /api/project/list': 'ProjectController.apiGetList',
   'GET /api/project/:identity': 'ProjectController.apiGetOne',
   'POST /api/faq/forms': 'FAQController.apiCreateForm',
+  'GET /api/project/:identity/history/:historyId': 'ProjectHistoryController.apiGetOne',
+  'GET /api/project/:identity/history': 'ProjectHistoryController.apiGetList',
 
   //## for Client
   'GET /api/project/one': 'ProjectController.apiGetMyProject',
   'GET /api/project/schema': 'FormController.apiGetSchema',
-
-  'GET /api/project/:identity/history/:historyId': 'ProjectHistoryController.apiGetOne',
-  'GET /api/project/:identity/history': 'ProjectHistoryController.apiGetList',
 
   'GET /api/project/:identity/verifiedEmails': 'ProjectMentionedPersonController.apiGetVerifiedEmail',
   'GET /api/project/verified': 'ProjectMentionedPersonController.verified',

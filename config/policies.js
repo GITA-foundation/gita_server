@@ -40,15 +40,12 @@ module.exports.policies = {
     callback: []
   },
   ProjectController: {
-    apiMyProject: ['authToken', 'verifiedUserRequired'],
+    apiGetMyProject: ['authToken', 'verifiedUserRequired'],
     apiCreate: ['authToken', 'verifiedUserRequired'],
     apiCreateComment: ['authToken'],
     apiUpdate: ['authToken', 'verifiedUserRequired'],
   },
-  ProjectHistoryController: {
-    apiGetList: ['authToken'],
-    apiGetOne: ['authToken'],
-  },
+  ProjectHistoryController: [],
   FormController: {
     showView: ['loginRequired', 'adminRequired'],
     apiUpdate: ['loginRequired'],

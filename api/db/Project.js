@@ -33,7 +33,11 @@ module.exports = function(sequelize, DataTypes) {
         const total = Object.keys(newContent).length;
         const finishedTotal = getTotalFinished(newContent);
         console.log(`total ==> ${total}, finishedTotal ==> ${finishedTotal}`);
-        const percent = finishedTotal >= total ? 100 : parseInt(finishedTotal/total*100);
+        const percent = total === 0
+          ? 0
+          : finishedTotal >= total
+            ? 100 : parseInt(finishedTotal / total * 100);
+
         this.setDataValue("percent", percent);
         this.setDataValue("isGitaStandard", isProjectStandard(newContent));
         return this.setDataValue("items", JSON.stringify(newContent));
